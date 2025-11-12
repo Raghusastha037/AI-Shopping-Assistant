@@ -24,9 +24,9 @@ st.set_page_config(
 # -------------------------
 # API KEYS
 # -------------------------
-GEMINI_API_KEY = "AIzaSyC5ztA0MRgOeIvyH_zlJYhNpbAgIH5GLis"  # Replace with your actual API key
-SERPER_KEY = "5209c624b95dc434aa84048ad0a86a4b8e56e2a3"
-ALIEXPRESS_KEY = "1793d00f5bmsh70336acf73d42fap122539jsnc3f8f1aa3758"
+GEMINI_API_KEY = "GEMINI API KEY"  # Replace with your actual API key
+SERPER_KEY = "SERPER API KEY"
+ALIEXPRESS_KEY = "ALIEXPRESS API KEY"
 # -------------------------
 # Gemini setup
 # -------------------------       
@@ -230,4 +230,5 @@ if prompt := st.chat_input("What would you like to know?"):
 
 # Footer
 st.markdown("---")
+
 st.caption("Powered by Gemini AI & Streamlit")
