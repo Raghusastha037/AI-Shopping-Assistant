@@ -2,6 +2,7 @@ import asyncio
 import aiohttp
 import requests
 import streamlit as st
+import os
 
 # Try importing Gemini
 try:
@@ -22,18 +23,39 @@ st.set_page_config(
 )
 
 # -------------------------
-# API KEYS
+# API KEYS - SECURE METHOD
 # -------------------------
-GEMINI_API_KEY = "GEMINI API KEY"  # Replace with your actual API key
-SERPER_KEY = "SERPER API KEY"
-ALIEXPRESS_KEY = "ALIEXPRESS API KEY"
+# Method 1: Streamlit Secrets (for Streamlit Cloud deployment)
+# Method 2: Environment Variables (for local development)
+
+def get_api_key(key_name, secret_name):
+    """Get API key from Streamlit secrets or environment variables"""
+    try:
+        # Try Streamlit secrets first (for cloud deployment)
+        return st.secrets[secret_name]
+    except:
+        # Fall back to environment variables (for local development)
+        return os.getenv(key_name, "")
+
+GEMINI_API_KEY = get_api_key("GEMINI_API_KEY", "GEMINI_API_KEY")
+SERPER_KEY = get_api_key("SERPER_KEY", "SERPER_KEY")
+ALIEXPRESS_KEY = get_api_key("ALIEXPRESS_KEY", "ALIEXPRESS_KEY")
+
+# Validate API keys
+if not GEMINI_API_KEY:
+    st.error("❌ GEMINI_API_KEY not found. Please set it in secrets.toml or environment variables.")
+if not SERPER_KEY:
+    st.warning("⚠️ SERPER_KEY not found. Search functionality may be limited.")
+if not ALIEXPRESS_KEY:
+    st.warning("⚠️ ALIEXPRESS_KEY not found. Product search may be limited.")
+
 # -------------------------
 # Gemini setup
 # -------------------------       
 @st.cache_resource
 def setup_gemini():
     """Initialize Gemini with caching to avoid repeated setup"""
-    if not GEMINI_AVAILABLE:
+    if not GEMINI_AVAILABLE or not GEMINI_API_KEY:
         return None, False
     
     try:
@@ -67,6 +89,8 @@ ALIEXPRESS_HEADERS = {
 }
 
 async def fetch_aliexpress(query):
+    if not ALIEXPRESS_KEY:
+        return None
     url = "https://aliexpress-datahub.p.rapidapi.com/search"
     params = {"query": query, "limit": "8"}
     try:
@@ -84,6 +108,8 @@ async def fetch_aliexpress(query):
         return None
 
 def fetch_serper_data(query):
+    if not SERPER_KEY:
+        return None
     url = "https://google.serper.dev/search"
     headers = {"X-API-KEY": SERPER_KEY, "Content-Type": "application/json"}
     payload = {"q": query, "num": 10}
@@ -230,5 +256,4 @@ if prompt := st.chat_input("What would you like to know?"):
 
 # Footer
 st.markdown("---")
-
 st.caption("Powered by Gemini AI & Streamlit")
